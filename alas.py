@@ -18,9 +18,20 @@ from module.notify import handle_notify
 class AzurLaneAutoScript:
     stop_event: threading.Event = None
 
-    def __init__(self, config_name='alas'):
+    def __init__(self, config_name='alas', screenshot_queue=None, screenshot_enabled=None):
+        """
+        初始化 AzurLaneAutoScript 实例
+        
+        Args:
+            config_name (str): 配置文件名称
+            screenshot_queue: 多进程截图数据队列（可选）
+            screenshot_enabled: 截图启用标志（可选）
+        """
         logger.hr('Start', level=0)
         self.config_name = config_name
+        # 截图队列支持（用于WebUI实时显示）
+        self.screenshot_queue = screenshot_queue
+        self.screenshot_enabled = screenshot_enabled
         # Skip first restart
         self.is_first_task = True
         # Failure count of tasks
