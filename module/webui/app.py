@@ -2059,6 +2059,126 @@ class AlasGUI(Frame):
         '''
         )
 
+        # Announcement check feature
+        # Fetches announcement from API on page load and every 5 minutes
+        # Only shows if announcementId hasn't been shown before (stored in localStorage)
+        run_js(
+            '''
+        (function(){
+            var ANNOUNCEMENT_API = 'https://ep.nekro.ai/e/wess09/alas/api/a1';
+            var STORAGE_KEY = 'alas_shown_announcements';
+            var CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes in milliseconds
+
+            function getShownAnnouncements() {
+                try {
+                    var stored = localStorage.getItem(STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : [];
+                } catch (e) {
+                    return [];
+                }
+            }
+
+            function markAnnouncementShown(announcementId) {
+                try {
+                    var shown = getShownAnnouncements();
+                    if (shown.indexOf(announcementId) === -1) {
+                        shown.push(announcementId);
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(shown));
+                    }
+                } catch (e) {}
+            }
+
+            function hasBeenShown(announcementId) {
+                var shown = getShownAnnouncements();
+                return shown.indexOf(announcementId) !== -1;
+            }
+
+            function showAnnouncementModal(title, content, announcementId) {
+                // Create modal overlay
+                var overlay = document.createElement('div');
+                overlay.id = 'alas-announcement-modal';
+                overlay.style.cssText = 'position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);z-index:100000;display:flex;justify-content:center;align-items:center;';
+
+                // Create modal content
+                var modal = document.createElement('div');
+                modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3);';
+
+                // Title
+                var titleEl = document.createElement('h3');
+                titleEl.textContent = title;
+                titleEl.style.cssText = 'margin:0 0 16px 0;font-size:1.25rem;color:#333;border-bottom:2px solid #4fc3f7;padding-bottom:8px;';
+
+                // Content
+                var contentEl = document.createElement('div');
+                contentEl.textContent = content;
+                contentEl.style.cssText = 'font-size:1rem;color:#555;line-height:1.6;margin-bottom:20px;white-space:pre-wrap;';
+
+                // Close button
+                var closeBtn = document.createElement('button');
+                closeBtn.textContent = '确认';
+                closeBtn.style.cssText = 'background:linear-gradient(90deg,#00b894,#0984e3);color:#fff;border:none;padding:10px 32px;border-radius:6px;cursor:pointer;font-size:1rem;display:block;margin:0 auto;';
+                closeBtn.onmouseover = function(){ closeBtn.style.opacity = '0.9'; };
+                closeBtn.onmouseout = function(){ closeBtn.style.opacity = '1'; };
+                closeBtn.onclick = function(){
+                    markAnnouncementShown(announcementId);
+                    overlay.remove();
+                };
+
+                modal.appendChild(titleEl);
+                modal.appendChild(contentEl);
+                modal.appendChild(closeBtn);
+                overlay.appendChild(modal);
+
+                // Close on overlay click
+                overlay.onclick = function(e){
+                    if (e.target === overlay) {
+                        markAnnouncementShown(announcementId);
+                        overlay.remove();
+                    }
+                };
+
+                document.body.appendChild(overlay);
+
+                // Apply dark theme if needed
+                try {
+                    var isDark = document.body.classList.contains('pywebio-dark') ||
+                                 document.documentElement.getAttribute('data-theme') === 'dark' ||
+                                 localStorage.getItem('Theme') === 'dark';
+                    if (isDark) {
+                        modal.style.background = '#2d3436';
+                        titleEl.style.color = '#dfe6e9';
+                        contentEl.style.color = '#b2bec3';
+                    }
+                } catch (e) {}
+            }
+
+            function checkAnnouncement() {
+                fetch(ANNOUNCEMENT_API)
+                    .then(function(response) {
+                        if (!response.ok) throw new Error('Network response was not ok');
+                        return response.json();
+                    })
+                    .then(function(data) {
+                        if (data && data.announcementId && data.title && data.content) {
+                            if (!hasBeenShown(data.announcementId)) {
+                                showAnnouncementModal(data.title, data.content, data.announcementId);
+                            }
+                        }
+                    })
+                    .catch(function(error) {
+                        console.log('Announcement check failed:', error);
+                    });
+            }
+
+            // Check on page load (with small delay to ensure page is ready)
+            setTimeout(checkAnnouncement, 2000);
+
+            // Check every 5 minutes
+            setInterval(checkAnnouncement, CHECK_INTERVAL);
+        })();
+        '''
+        )
+
         aside = get_localstorage("aside")
         self.show()
 
