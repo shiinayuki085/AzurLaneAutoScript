@@ -55,12 +55,12 @@ footer {
 
 .btn-aside {
     width: 4rem;
-    height: 4.5rem;
+    height: 5.5rem;
     font-weight: 500;
     font-size: .85rem;
     background-color: transparent;
-    padding-top: 3.2rem;
-    padding-bottom: 0.2rem;
+    padding-top: 3.8rem;
+    padding-bottom: 0.5rem;
     padding-left: 0;
     padding-right: 0;
     display: flex;
@@ -69,7 +69,7 @@ footer {
     justify-content: flex-start;
     border-radius: 12px;
     border: 0 solid;
-    margin: -2.8rem auto 0.5rem auto !important;
+    margin: -3.5rem auto 0.5rem auto !important;
     transition: all .2s ease;
     z-index: 2;
 }
@@ -338,6 +338,21 @@ pre.rich-traceback-code {
     margin: 0;
 }
 
+#pywebio-scope-scheduler-bar,
+#pywebio-scope-log-bar {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 12px 12px 0 0;
+    padding: 0.6rem 1rem !important;
+    margin: 0.3125rem 0.3125rem 0 !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#pywebio-scope-image-container,
+#pywebio-scope-log {
+    margin-top: 0 !important;
+    border-radius: 0 0 12px 12px !important;
+}
+
 .anim-rotate {
     animation: rotate-keyframes 0.4s linear infinite
 }
@@ -442,8 +457,22 @@ pre.rich-traceback-code {
     font-weight: 400;
     width: 100%;
     display: grid;
-    grid-auto-flow: row;
-    grid-template-columns: repeat(auto-fit,minmax(10rem,1fr));
+    grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+    gap: 0.75rem;
+    padding: 0.5rem;
+}
+
+[id^="pywebio-scope-dashboard_"] {
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: transform 0.2s ease, background-color 0.2s ease;
+}
+
+[id^="pywebio-scope-dashboard_"]:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    transform: translateY(-2px);
 }
 
 #pywebio-scope-dashboard .form-control{
@@ -494,7 +523,12 @@ pre.rich-traceback-code {
     display: grid;
     grid-auto-flow: column;
     grid-template-columns: 1fr auto;
-    margin: .125rem .625rem .125rem .375rem;
+    margin: 0.5rem;
+    padding: 0.75rem;
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    align-items: center;
 }
 
 #pywebio-scope-daemon-overview {
