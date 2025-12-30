@@ -742,9 +742,10 @@ class OperationSiren(OSMap):
                 if exec_fixed:
                     self._execute_fixed_patrol_scan(ExecuteFixedPatrolScan=True)
 
+
             self.handle_after_auto_search()
             solved_events = getattr(self, '_solved_map_event', set())
-                if 'is_akashi' in solved_events:
+            if 'is_akashi' in solved_events:
                 try:
                     from datetime import datetime
                     key = f"{datetime.now():%Y-%m}-akashi"
@@ -754,6 +755,7 @@ class OperationSiren(OSMap):
                     logger.attr('cl1_akashi_monthly', data[key])
                 except Exception:
                     logger.exception('Failed to persist CL1 akashi monthly count')
+
 
             # 每次循环结束后提交CL1数据
             try:
