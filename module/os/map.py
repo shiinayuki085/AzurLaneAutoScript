@@ -1304,16 +1304,22 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
                 keys='OpsiHazard1Leveling.OpsiHazard1Leveling.SirenBug_Enable',
                 default=False
             ))
-            siren_bug_zone = int(self.config.cross_get(
+            siren_bug_zone = self.config.cross_get(
                 keys='OpsiHazard1Leveling.OpsiHazard1Leveling.SirenBug_Zone',
                 default=0
-            ))
+            )
         except Exception as e:
             logger.warning(f'读取SirenBug配置失败: {e}，跳过塞壬研究装置BUG利用')
             return
 
+        # SirenBug_Zone 预处理：嘗試轉换為 int
+        try:
+            siren_bug_zone = int(siren_bug_zone)
+        except (ValueError, TypeError):
+            pass
+
         # 前置条件校验
-        if not (siren_research_enable and siren_bug_enable and siren_bug_zone != 0):
+        if not (siren_research_enable and siren_bug_enable and siren_bug_zone):
             logger.info('SirenBug功能前置条件不满足，跳过塞壬研究装置BUG利用')
             return
 
@@ -1321,15 +1327,23 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
         if current_zone_id not in (22, 44):
             logger.warning(f'当前区域{current_zone_id}非侵蚀一，跳过塞壬研究装置BUG利用')
             return
+        
         erosion_one_zone = self.name_to_zone(current_zone_id)
+        # 解析目标区域
+        try:
+            target_zone = self.name_to_zone(siren_bug_zone)
+        except Exception:
+            logger.warning(f'无法解析SirenBug目标区域: {siren_bug_zone}，跳过塞壬研究装置BUG利用')
+            return
+
         logger.hr(f'RUN SIREN BUG EXPLOITATION')
-        logger.info('当前区域: {erosion_one_zone}, 目标区域: {siren_bug_zone}')
+        logger.info(f'当前区域: {erosion_one_zone}, 目标区域: {target_zone}')
 
         try:
             # 跳转至指定高侵蚀区域
             with self.config.temporary(STORY_ALLOW_SKIP=False):
                 self.os_map_goto_globe(unpin=False)
-                self.globe_goto(siren_bug_zone, types=('SAFE', 'DANGEROUS'), refresh=True)
+                self.globe_goto(target_zone, types=('SAFE', 'DANGEROUS'), refresh=True)
                 self.zone_init()
                 self.map_init(map_=None)
                 camera_queue = self.map.camera_data
