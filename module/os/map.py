@@ -1379,25 +1379,31 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
 
                         # 移动舰队至塞壬研究装置，触发剧情
                         self.device.click(grid)
-                        time.sleep(1)
-                        #result = self.wait_until_walk_stable(drop=drop, walk_out_of_step=False, confirm_timer=Timer(1.5, count=4))
-                        #if 'event' in result:
                         with self.config.temporary(STORY_ALLOW_SKIP=False):
-                            self._solved_map_event.add('is_scanning_device')
+                            result = self.wait_until_walk_stable(
+                                drop=drop, walk_out_of_step=False, confirm_timer=Timer(1.5, count=4))
+                        
+                        # 检查是否成功移动到设备位置
+                        if 'event' not in result:
+                            logger.warning('未能成功移动到塞壬研究装置，跳过Bug利用')
+                            break
+                        logger.info('成功移动到塞壬研究装置')
 
-                            # 第2个选项
-                            if self._select_story_option_by_index(target_index=1, options_count=3):      
-                                self._click_story_confirm_button()
-                            # 第2个选项
-                            time.sleep(0.8)
-                            if self._select_story_option_by_index(target_index=1, options_count=3):      
-                                self._click_story_confirm_button()
-                            # 第3个选项
-                            time.sleep(0.8)
-                            if self._select_story_option_by_index(target_index=2, options_count=3):      
-                                self._click_story_confirm_button()
-
-                            device_handled = True
+                        self._solved_map_event.add('is_scanning_device')
+                        logger.info('开始执行Bug利用点击流程')
+                        # 第2个选项
+                        if self._select_story_option_by_index(target_index=1, options_count=3):      
+                            self._click_story_confirm_button()
+                        # 第2个选项
+                        time.sleep(0.8)
+                        if self._select_story_option_by_index(target_index=1, options_count=3):      
+                            self._click_story_confirm_button()
+                        # 第3个选项
+                        time.sleep(0.8)
+                        if self._select_story_option_by_index(target_index=2, options_count=3):      
+                            self._click_story_confirm_button()
+                        logger.info('Bug利用点击流程完成')
+                        device_handled = True
                         #break
                     time.sleep(0.5)
 
