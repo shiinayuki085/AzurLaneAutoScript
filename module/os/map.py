@@ -945,15 +945,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
             logger.info(f'Found scanning device on {grid}')
 
             # 检查是否开启研究装置交互
-            siren_research_enabled = False
-            try:
-                siren_research_enabled = bool(self.config.cross_get(
-                    keys='OpsiHazard1Leveling.OpsiHazard1Leveling.SirenResearch_Enable',
-                    default=False
-                ))
-            except Exception:
-                logger.warning('Failed to get SirenResearch config, disabled by default')
-                siren_research_enabled = False
+            siren_research_enabled = getattr(self.config, 'OpsiSirenBug_SirenResearch_Enable', False)
             
             if not siren_research_enabled:
                 logger.info('SirenResearch disabled by config, skip scanning device')
@@ -1296,26 +1288,11 @@ class OSMap(OSFleet, Map, GlobeCamera, StrategicSearchHandler):
     def _handle_siren_bug_reinteract(self, drop=None):
         # 侵蚀一塞壬研究装置处理后，跳转指定高侵蚀区域触发塞壬研究装置消耗两次紫币，最后返回侵蚀一自律   
         try:
-            siren_research_enable = bool(self.config.cross_get(
-                keys='OpsiHazard1Leveling.OpsiSirenBug.SirenResearch_Enable',
-                default=False
-            ))
-            siren_bug_enable = bool(self.config.cross_get(
-                keys='OpsiHazard1Leveling.OpsiSirenBug.SirenBug_Enable',
-                default=False
-            ))
-            siren_bug_zone = self.config.cross_get(
-                keys='OpsiHazard1Leveling.OpsiSirenBug.SirenBug_Zone',
-                default=0
-            )
-            siren_bug_type = self.config.cross_get(
-                keys='OpsiHazard1Leveling.OpsiSirenBug.SirenBug_Type',
-                default='dangerous'
-            )
-            disable_task_switch = bool(self.config.cross_get(
-                keys='OpsiHazard1Leveling.OpsiSirenBug.DisableTaskSwitchDuringBug',
-                default=False
-            ))
+            siren_research_enable = getattr(self.config, 'OpsiSirenBug_SirenResearch_Enable', False)
+            siren_bug_enable = getattr(self.config, 'OpsiSirenBug_SirenBug_Enable', False)
+            siren_bug_zone = getattr(self.config, 'OpsiSirenBug_SirenBug_Zone', 0)
+            siren_bug_type = getattr(self.config, 'OpsiSirenBug_SirenBug_Type', 'dangerous')
+            disable_task_switch = getattr(self.config, 'OpsiSirenBug_DisableTaskSwitchDuringBug', False)
         except Exception as e:
             logger.warning(f'读取SirenBug配置失败: {e}，跳过塞壬研究装置BUG利用')
             return
