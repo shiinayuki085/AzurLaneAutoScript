@@ -942,6 +942,16 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
 
         return finished_combat
 
+    @property
+    def _is_siren_research_enabled(self):
+        """
+        Check if siren research feature is enabled in config.
+        
+        Returns:
+            bool: True if enabled, False otherwise
+        """
+        return getattr(self.config, 'OpsiSirenBug_SirenResearch_Enable', False)
+
     def _should_skip_siren_research(self, grid):
         """
         Check if siren research device should be skipped based on config.
@@ -953,8 +963,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
             bool: True if should skip (feature disabled), False otherwise
         """
         if hasattr(grid, 'is_scanning_device') and grid.is_scanning_device:
-            siren_research_enabled = getattr(self.config, 'OpsiSirenBug_SirenResearch_Enable', False)
-            if not siren_research_enabled:
+            if not self._is_siren_research_enabled:
                 logger.info(f'[预检查] 格子 {grid} 是塞壬研究装置,但功能未开启,跳过')
                 return True
             else:
@@ -1382,8 +1391,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
             logger.hr('发现研究装置,开始处理', level=2)
             logger.info(f'[地图选择] 在 {grid} 位置发现研究装置')
             
-            siren_research_enabled = getattr(self.config, 'OpsiSirenBug_SirenResearch_Enable', False)
-            if not siren_research_enabled:
+            if not self._is_siren_research_enabled:
                 logger.warning('[配置检查] 塞壬研究装置功能已禁用,跳过处理')
                 self._solved_map_event.add('is_scanning_device')
                 return True
@@ -1413,7 +1421,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
                 
                 self._solved_map_event.add('is_scanning_device')
                 
-                if self.is_siren_device_confirmed:
+                if getattr(self, 'is_siren_device_confirmed', False):
                     logger.info('[装置处理] 已确认为塞壬研究装置，检查是否需要执行Bug利用')
                     self._handle_siren_bug_reinteract(drop=drop)
                 else:
