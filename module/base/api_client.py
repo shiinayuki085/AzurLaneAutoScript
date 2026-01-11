@@ -1,6 +1,6 @@
 """
 API 客户端模块
-负责与 alascloudapi.nanoda.work 进行所有HTTP交互
+负责与 alas-apiv2.nanoda.work 进行所有HTTP交互
 包括Bug日志上报和CL1数据提交
 """
 import threading
@@ -15,8 +15,8 @@ from module.logger import logger
 class ApiClient:
     """统一的API客户端"""
     
-    BUG_LOG_ENDPOINT = 'https://alascloudapi.nanoda.work/api/post/bug'
-    CL1_DATA_ENDPOINT = 'https://alascloudapi.nanoda.work/api/telemetry'
+    BUG_LOG_ENDPOINT = 'https://alas-apiv2.nanoda.work/api/post/bug'
+    CL1_DATA_ENDPOINT = 'https://alas-apiv2.nanoda.work/api/telemetry'
     
     @staticmethod
     def _submit_bug_log(content: str, log_type: str):

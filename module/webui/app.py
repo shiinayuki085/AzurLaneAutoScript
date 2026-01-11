@@ -2289,7 +2289,7 @@ class AlasGUI(Frame):
                 # Add timestamp to bypass cache
                 timestamp = int(time.time())
                 resp = requests.get(
-                    f'https://alascloudapi.nanoda.work/api/get/announcement?t={timestamp}',
+                    f'https://alas-apiv2.nanoda.work/api/get/announcement?t={timestamp}',
                     timeout=10
                 )
                 if resp.status_code == 200:

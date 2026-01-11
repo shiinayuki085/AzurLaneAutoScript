@@ -23,7 +23,7 @@ from module.logger import logger
 class Cl1DataSubmitter:
     """CL1数据提交器"""
     
-    def __init__(self, endpoint: str = 'https://alascloudapi.nanoda.work/api/telemetry', instance_name: str | None = None):
+    def __init__(self, endpoint: str = 'https://alas-apiv2.nanoda.work/api/telemetry', instance_name: str | None = None):
         """
         初始化数据提交器
         
