@@ -11,7 +11,6 @@ from module.base.timer import Timer
 from module.config.config import TaskEnd
 from module.config.utils import get_os_reset_remain
 from module.exception import CampaignEnd, GameTooManyClickError, MapWalkError, RequestHumanTakeover, ScriptError
-from module.exercise.assets import QUIT_RECONFIRM
 from module.handler.login import LoginHandler, MAINTENANCE_ANNOUNCE
 from module.logger import logger
 from module.map.map import Map
@@ -752,12 +751,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
         finished_combat = 0
         died_timer = Timer(1.5, count=3)
         self.hp_reset()
-        while 1:
-            if skip_first_screenshot:
-                skip_first_screenshot = False
-            else:
-                self.device.screenshot()
-
+        for _ in self.loop():
             # End
             if not unlock_checked and unlock_check_timer.reached():
                 logger.critical('Unable to use auto search in current zone')
@@ -841,6 +835,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
             else:
                 self.device.screenshot()
 
+
             # End
             if self.is_in_main():
                 logger.info('Auto search interrupted')
@@ -871,7 +866,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
                 in_main_timer.reset()
                 in_map_timer.reset()
                 continue
-            if self.appear_then_click(QUIT_RECONFIRM, offset=True, interval=5):
+            if self.handle_combat_quit_reconfirm():
                 self.interval_reset(MAINTENANCE_ANNOUNCE)
                 pause_interval.reset()
                 in_main_timer.reset()
@@ -1712,7 +1707,9 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
 
                             # 首先检测是否遇到的是柱子
                             if self.appear_then_click(REWARD_BOX_THIRD_OPTION, offset=(20, 20), interval=3):
-                                logger.warning('[Bug利用] 检测到柱子选项，重新开始寻找装置')
+                                logger.warning('[Bug利用] 检测到宝箱选项，重新开始寻找装置')
+                                find_device_timer.reset()
+                                camera_queue = self.map.camera_data
                                 self._solved_map_event.remove('is_scanning_device')
                                 continue  
 
@@ -1769,7 +1766,6 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
             logger.info('【塞壬Bug利用】返回侵蚀一区域')
             self.os_map_goto_globe(unpin=False)
             self.globe_goto(erosion_one_zone, types=('SAFE', 'DANGEROUS'), refresh=True)
-            self.zone_init()
             logger.info('【塞壬Bug利用】返回侵蚀一区域完成')
 
             # Increase bug count
@@ -1778,8 +1774,6 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
             count = self.config.OpsiSirenBug_SirenBug_DailyCount
             logger.info(f'Siren bug exploitation successful, daily count: {count}')
 
-            self.run_auto_search(question=True, rescan='full', after_auto_search=True)
-            
             # 发送成功通知
             try:
                 if hasattr(self, 'notify_push'):
@@ -1817,7 +1811,7 @@ class OSMap(OSFleet, Map, GlobeCamera, StorageHandler, StrategicSearchHandler):
             try:
                 self.os_map_goto_globe(unpin=False)
                 self.globe_goto(erosion_one_zone, types=('SAFE', 'DANGEROUS'), refresh=True)
-                self.zone_init()
+                logger.info('异常处理：返回侵蚀一区域')
             except Exception as return_err:
                 logger.error(f'返回侵蚀一失败: {return_err}')
         finally:
