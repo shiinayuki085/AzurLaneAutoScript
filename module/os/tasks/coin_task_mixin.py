@@ -129,25 +129,28 @@ class CoinTaskMixin:
         )
         
         # Get OperationCoinsReturnThreshold from OpsiScheduling config
-        # Try direct access first (if config is bound), then fallback to cross_get
-        # Also fallback if the value is None (to handle cases where attribute exists but is None)
-        return_threshold_config = None
-        if hasattr(self.config, 'OpsiScheduling_OperationCoinsReturnThreshold'):
+        # Always use cross_get to read from config file, because the config is under OpsiHazard1Leveling
+        # which may not be in the bind list when running other tasks like OpsiAbyssal
+        # This ensures we read the actual value from config file, not the default from config_generated.py
+        return_threshold_config = self.config.cross_get(
+            keys=self.CONFIG_PATH_RETURN_THRESHOLD,
+            default=None
+        )
+        
+        # If cross_get returns None, try direct attribute access as fallback
+        # (in case the config path structure changes in the future)
+        if return_threshold_config is None and hasattr(self.config, 'OpsiScheduling_OperationCoinsReturnThreshold'):
             attr_value = self.config.OpsiScheduling_OperationCoinsReturnThreshold
-            # If attribute exists and has a valid value (not None), use it
-            # Otherwise, fallback to cross_get to try reading from config file
             if attr_value is not None:
                 return_threshold_config = attr_value
         
-        # Fallback: use cross_get if direct access didn't yield a valid value
-        if return_threshold_config is None:
-            return_threshold_config = self.config.cross_get(
-                keys=self.CONFIG_PATH_RETURN_THRESHOLD,
-                default=None
-        )
+        # Log the config value for debugging
+        logger.info(f'OperationCoinsReturnThreshold 配置值: {return_threshold_config}, CL1保留值: {cl1_preserve}')
         
         # If value is 0, disable yellow coin check
+        # Use explicit comparison with 0 (not just falsy check) to handle 0 correctly
         if return_threshold_config == 0:
+            logger.info('OperationCoinsReturnThreshold 为 0，禁用黄币检查')
             return None, cl1_preserve
         
         # If value is None, use default (equal to cl1_preserve, resulting in 2x threshold)
@@ -177,7 +180,7 @@ class CoinTaskMixin:
         
         # If check is disabled (return_threshold is None), skip
         if return_threshold is None:
-            logger.debug('OperationCoinsReturnThreshold 为 0，跳过黄币检查')
+            logger.info('OperationCoinsReturnThreshold 为 0，跳过黄币检查，仅使用行动力阈值控制')
             return False
         
         yellow_coins = self.get_yellow_coins()
