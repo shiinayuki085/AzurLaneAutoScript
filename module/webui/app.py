@@ -12,7 +12,7 @@ import re
 from datetime import datetime, timedelta
 from pathlib import Path
 from functools import partial
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 # Import fake module before import pywebio to avoid importing unnecessary module PIL
 from module.webui.fake_pil_module import import_fake_pil_module
@@ -44,7 +44,7 @@ from pywebio.output import (
     use_scope,
 )
 from pywebio.pin import pin, pin_on_change
-from pywebio.session import download, go_app, info, local, register_thread, run_js, set_env
+from pywebio.session import download, go_app, info, local, register_thread, run_js, set_env, eval_js
 
 import module.webui.lang as lang
 from module.config.config import AzurLaneConfig, Function
@@ -71,7 +71,7 @@ from module.webui.base import Frame
 from module.webui.discord_presence import close_discord_rpc, init_discord_rpc
 from module.webui.fastapi import asgi_app
 from module.webui.lang import _t, t
-from module.webui.patch import patch_executor, patch_mimetype
+from module.webui.patch import fix_py37_subprocess_communicate, patch_executor, patch_mimetype
 from module.webui.pin import put_input, put_select
 from module.webui.process_manager import ProcessManager
 from module.webui.remote_access import RemoteAccess
@@ -105,6 +105,7 @@ from module.webui.widgets import (
 
 patch_executor()
 patch_mimetype()
+fix_py37_subprocess_communicate()
 task_handler = TaskHandler()
 
 
@@ -140,7 +141,12 @@ class AlasGUI(Frame):
     def initial(self) -> None:
         self.ALAS_MENU = read_file(filepath_args("menu", self.alas_mod))
         self.ALAS_ARGS = read_file(filepath_args("args", self.alas_mod))
+        self.ALAS_MENU = read_file(filepath_args("menu", self.alas_mod))
+        self.ALAS_ARGS = read_file(filepath_args("args", self.alas_mod))
         self._init_alas_config_watcher()
+
+        if self.theme == "apple":
+            add_css(filepath_css("apple-alas"))
 
     def __init__(self) -> None:
         super().__init__()
@@ -156,7 +162,7 @@ class AlasGUI(Frame):
         self.inst_cache = []
         self.load_home = False
         self.af_flag = False
-        self.last_displayed_screenshot_base64 = None
+
 
     @use_scope("aside", clear=True)
     def set_aside(self) -> None:
@@ -166,8 +172,8 @@ class AlasGUI(Frame):
             buttons=[{"label": t("Gui.Aside.Home"), "value": "Home", "color": "aside"}],
             onclick=[self.ui_develop],
         )
-        put_scope("aside_instance",[
-            put_scope(f"alas-instance-{i}",[])
+        put_scope("aside_instance", [
+            put_scope(f"alas-instance-{i}", [])
             for i, _ in enumerate(alas_instance())
         ])
         self.set_aside_status()
@@ -189,7 +195,8 @@ class AlasGUI(Frame):
 
     @use_scope("aside_instance")
     def set_aside_status(self) -> None:
-        flag = True       
+        flag = True
+
         def update(name, seq):
             with use_scope(f"alas-instance-{seq}", clear=True):
                 icon_html = Icon.RUN
@@ -202,7 +209,7 @@ class AlasGUI(Frame):
                     onclick=self.ui_alas,
                 )
             return rendered_state
-        
+
         if not len(self.rendered_cache) or self.load_home:
             # Reload when add/delete new instance | first start app.py | go to HomePage (HomePage load call force reload)
             flag = False
@@ -225,7 +232,7 @@ class AlasGUI(Frame):
             # Redraw lost focus, now focus on aside button
             aside_name = get_localstorage("aside")
             self.active_button("aside", aside_name)
-        
+
         return
 
     @use_scope("header_status")
@@ -261,6 +268,9 @@ class AlasGUI(Frame):
         pywebio_theme = theme if theme in ("default", "dark", "light") else "dark"
         if theme == "socialism":
             pywebio_theme = "default"
+        if theme == "apple":
+            pywebio_theme = "default"
+
         webconfig(theme=pywebio_theme)
 
     @use_scope("menu", clear=True)
@@ -702,18 +712,6 @@ class AlasGUI(Frame):
         put_scope("overview", [put_scope("schedulers"), put_scope("logs")])
 
         with use_scope("schedulers"):
-            if getattr(State, "display_screenshots", False) and hasattr(self, 'alas') and self.alas.alive and self.alas.get_latest_screenshot:
-                img_html = f'<img id="screenshot-img" src="data:image/jpg;base64,{self.alas.get_latest_screenshot}" style="max-height:240px; width:auto;">'
-                put_scope("image-container", [put_html(img_html)])
-            else:
-                put_scope(
-                    "image-container",
-                    [
-                        put_html(
-                            f'<img id="screenshot-img" src="{State.get_placeholder_url()}" data-modal-src="{State.get_placeholder_url()}" style="max-height:240px; width:auto;">'
-                        )
-                    ],
-                )
             put_scope(
                 "scheduler-bar",
                 [
@@ -789,7 +787,6 @@ class AlasGUI(Frame):
                         put_scope(
                             "log-bar-btns",
                             [
-                                put_scope("screenshot_control_btn"),
                                 put_scope("log_scroll_btn"),
                                 put_scope("dashboard_btn"),
                             ],
@@ -831,93 +828,6 @@ class AlasGUI(Frame):
             self.task_handler.add(self.alas_update_dashboard, 10, True)
         if hasattr(self, 'alas') and self.alas is not None:
             self.task_handler.add(log.put_log(self.alas), 0.25, True)
-            self.task_handler.add(self.update_screenshot_display, 0.5, True)
-        else:
-            self.task_handler.add(self.update_screenshot_display, 0.5, True)
-
-        with use_scope("screenshot_control_btn", clear=True):
-            label = "看见了nanoda" if getattr(State, "display_screenshots", False) else "看不见nanoda"
-
-            def _toggle_screenshot(_=None):
-                State.display_screenshots = not getattr(State, "display_screenshots", False)
-                if State.display_screenshots:
-                    try:
-                        img_base64 = None
-                        if hasattr(self, 'alas') and self.alas.alive:
-                            img_base64 = self.alas.get_latest_screenshot
-                        if img_base64 is None:
-                            img_base64 = State.last_screenshot_base64
-                        if img_base64:
-                            src = f"data:image/jpg;base64,{img_base64}"
-                            run_js(f'var img=document.getElementById("screenshot-img"); if(img) {{ img.src="{src}"; img.setAttribute("data-modal-src", "{src}"); }}')
-                    except Exception:
-                        pass
-                else:
-                    current_url = State.get_placeholder_url()
-                    run_js(f'var img=document.getElementById("screenshot-img"); if(img) {{ img.src="{current_url}"; img.setAttribute("data-modal-src", "{current_url}"); }}')
-                try:
-                    for pm in ProcessManager.running_instances():
-                        try:
-                            pm.set_screenshot_enabled(State.display_screenshots)
-                        except Exception:
-                            pass
-                except Exception:
-                    pass
-                with use_scope("screenshot_control_btn", clear=True):
-                    put_buttons(
-                        [
-                            {"label": "显示" if State.display_screenshots else "隐藏", "value": "toggle", "color": "off"},
-                            {"label": "切换雪风大人图片", "value": "switch", "color": "off"},
-                        ],
-                        onclick=[_toggle_screenshot, _switch_placeholder],
-                    ).style("text-align: center")
-
-            def _switch_placeholder(_=None):
-                try:
-                    url = State.advance_placeholder()
-                    run_js(f'var img=document.getElementById("screenshot-img"); if(img) {{ img.src="{url}"; img.setAttribute("data-modal-src", "{url}"); }}')
-                    gradient = 'linear-gradient(90deg, #00b894, #0984e3)'
-                    toast(t("切换雪风大人图片"), duration=1, position="top", color=gradient)
-                    run_js(r"""
-                        setTimeout(function(){
-                            var el = document.querySelector('.toastify.toastify-top.toastify-right') || document.querySelector('.toastify.toastify-top') || document.querySelector('.toastify');
-                            if (!el) return;
-                            el.classList.add('alas-force-text');
-                            el.style.boxShadow = '0 6px 18px rgba(0,0,0,0.22)';
-                            el.style.zIndex = '2147483647';
-                            /* children inherit via .alas-force-text */
-                            try{
-                                if (el.classList && el.classList.contains('toastify-right')){
-                                    el.style.position = 'fixed';
-                                    el.style.top = '8px';
-                                    el.style.right = '8px';
-                                    el.style.left = 'auto';
-                                    el.style.transform = 'none';
-                                    el.style.margin = '0';
-                                } else {
-                                    el.style.position = 'fixed';
-                                    el.style.top = '8px';
-                                    el.style.left = '50%';
-                                    el.style.right = 'auto';
-                                    el.style.transform = 'translateX(-50%)';
-                                    el.style.margin = '0';
-                                }
-                            }catch(e){}
-                        }, 80);
-                    """)
-                except Exception:
-                    pass
-
-            if not hasattr(State, "display_screenshots"):
-                State.display_screenshots = True
-
-            put_buttons(
-                [
-                    {"label": label, "value": "toggle", "color": "off"},
-                    {"label": "切换雪风大人图片", "value": "switch", "color": "off"},
-                ],
-                onclick=[_toggle_screenshot, _switch_placeholder],
-            ).style("text-align: center")
 
     def set_dashboard_display(self, b):
         self._log.set_dashboard_display(b)
@@ -1158,6 +1068,7 @@ class AlasGUI(Frame):
         if self._log.first_display:
             self._log.first_display = False
 
+
     def alas_update_dashboard(self, _clear=False):
         if not self.visible:
             return
@@ -1167,196 +1078,6 @@ class AlasGUI(Frame):
             elif self._log.display_dashboard:
                 self._update_dashboard()
 
-    def update_screenshot_display(self):
-        if not getattr(State, "display_screenshots", False):
-            self.last_displayed_screenshot_base64 = None
-            if hasattr(State, "screenshot_queue") and hasattr(State.screenshot_queue, "clear"):
-                State.screenshot_queue.clear()
-            if hasattr(State, "last_screenshot_base64"):
-                State.last_screenshot_base64 = None
-            run_js(f'''
-                var img = document.getElementById("screenshot-img");
-                if (img) {{
-                    img.src = "{State.get_placeholder_url()}";
-                }}
-            ''')
-            return
-        img_base64 = None
-        if hasattr(self, 'alas') and self.alas.alive:
-            try:
-                img_base64 = self.alas.get_latest_screenshot
-            except Exception as e:
-                logger.error(f"从调度器获取截图失败: {e}")
-                with use_scope("image-container", clear=True):
-                    put_text("无法获取实时截图").style("font-size: 1.25rem; color: red; margin: auto;")
-
-        if img_base64 is None and State.last_screenshot_base64 is not None:
-            img_base64 = State.last_screenshot_base64
-
-        if img_base64 is not None and img_base64 != self.last_displayed_screenshot_base64:
-            self.last_displayed_screenshot_base64 = img_base64
-            js = '''
-            (function(){
-                var src = "data:image/jpg;base64,<<IMG>>";
-                var img = document.getElementById("screenshot-img");
-                if (!img) {
-                    return;
-                }
-                img.src = src;
-                img.setAttribute("data-modal-src", src);
-                img.style.maxWidth = "100%";
-                img.style.maxHeight = "240px";
-                img.style.height = "auto";
-                img.style.cursor = "zoom-in";
-                img.style.transform = "";
-
-                var modal = document.getElementById("screenshot-modal");
-                if (!modal) {
-                    modal = document.createElement("div");
-                    modal.id = "screenshot-modal";
-                    Object.assign(modal.style, {
-                        position: "fixed",
-                        left: 0,
-                        top: 0,
-                        width: "100vw",
-                        height: "100vh",
-                        display: "none",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        background: "rgba(0,0,0,0.65)",
-                        zIndex: 99999,
-                        overflow: "hidden",
-                        padding: "20px",
-                        boxSizing: "border-box",
-                        cursor: "grab"
-                    });
-                    var modalImg = document.createElement("img");
-                    modalImg.id = "screenshot-modal-img";
-                    Object.assign(modalImg.style, {
-                        maxWidth: "100%",
-                        maxHeight: "90vh",
-                        objectFit: "contain",
-                        boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
-                        transition: "transform 0.05s linear",
-                        transformOrigin: "center center",
-                        willChange: "transform"
-                    });
-                    modal.appendChild(modalImg);
-
-                    modal.dataset.scale = 1;
-                    modal.dataset.tx = 0;
-                    modal.dataset.ty = 0;
-                    modal.dataset.panning = 0;
-
-                    function applyTransform() {
-                        var s = parseFloat(modal.dataset.scale) || 1;
-                        var tx = parseFloat(modal.dataset.tx) || 0;
-                        var ty = parseFloat(modal.dataset.ty) || 0;
-                        modalImg.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')';
-                    }
-
-                    modal.addEventListener('wheel', function(e) {
-                        if (e.ctrlKey) return;
-                        e.preventDefault();
-                        var rect = modalImg.getBoundingClientRect();
-                        var cx = e.clientX - (rect.left + rect.width/2);
-                        var cy = e.clientY - (rect.top + rect.height/2);
-                        var scale = parseFloat(modal.dataset.scale) || 1;
-                        var delta = -e.deltaY;
-                        var factor = delta > 0 ? 1.12 : 0.88;
-                        var newScale = Math.min(6, Math.max(0.3, scale * factor));
-
-                        var tx = parseFloat(modal.dataset.tx) || 0;
-                        var ty = parseFloat(modal.dataset.ty) || 0;
-                        modal.dataset.tx = tx - cx * (newScale - scale);
-                        modal.dataset.ty = ty - cy * (newScale - scale);
-                        modal.dataset.scale = newScale;
-                        applyTransform();
-                    }, { passive: false });
-
-                    var start = { x:0, y:0 };
-                    modalImg.addEventListener('mousedown', function(e) {
-                        e.preventDefault();
-                        modal.dataset.panning = 1;
-                        start.x = e.clientX;
-                        start.y = e.clientY;
-                        modal.style.cursor = 'grabbing';
-                    });
-                    window.addEventListener('mousemove', function(e) {
-                        if (modal.dataset.panning !== '1') return;
-                        var dx = e.clientX - start.x;
-                        var dy = e.clientY - start.y;
-                        start.x = e.clientX;
-                        start.y = e.clientY;
-                        modal.dataset.tx = (parseFloat(modal.dataset.tx) || 0) + dx;
-                        modal.dataset.ty = (parseFloat(modal.dataset.ty) || 0) + dy;
-                        applyTransform();
-                    });
-                    window.addEventListener('mouseup', function(e) {
-                        if (modal.dataset.panning === '1') {
-                            modal.dataset.panning = 0;
-                            modal.style.cursor = 'grab';
-                        }
-                    });
-
-                    modalImg.addEventListener('dblclick', function(e) {
-                        modal.dataset.scale = 1;
-                        modal.dataset.tx = 0;
-                        modal.dataset.ty = 0;
-                        applyTransform();
-                    });
-
-                    modal.addEventListener('click', function(e) {
-                        if (e.target === modal) modal.style.display = "none";
-                    });
-
-                    document.body.appendChild(modal);
-                    document.addEventListener("keydown", function(e) {
-                        if (e.key === "Escape") modal.style.display = "none";
-                    });
-                }
-
-                img.src = src;
-                var modalImgEl = document.getElementById("screenshot-modal-img");
-                if (modalImgEl) {
-                    modalImgEl.src = img.getAttribute("data-modal-src") || src;
-                }
-
-                img.onclick = function(e) {
-                    var m = document.getElementById("screenshot-modal");
-                    var mi = document.getElementById("screenshot-modal-img");
-                    if (m && mi) {
-                        mi.src = img.getAttribute("data-modal-src") || img.src;
-                        m.dataset.scale = 1;
-                        m.dataset.tx = 0;
-                        m.dataset.ty = 0;
-                        mi.style.transform = '';
-                        m.style.display = "flex";
-                        applyTransform();
-                    }
-                };
-
-                function applyTransform() {
-                    var m = document.getElementById("screenshot-modal");
-                    if (!m) return;
-                    var mi = document.getElementById("screenshot-modal-img");
-                    var s = parseFloat(m.dataset.scale) || 1;
-                    var tx = parseFloat(m.dataset.tx) || 0;
-                    var ty = parseFloat(m.dataset.ty) || 0;
-                    if (mi) mi.style.transform = 'translate(' + tx + 'px,' + ty + 'px) scale(' + s + ')';
-                }
-            })();
-            '''
-            js = js.replace('<<IMG>>', img_base64)
-            run_js(js)
-        elif img_base64 is None:
-            run_js(f'''
-                var img = document.getElementById("screenshot-img");
-                if (img) {{
-                    img.src = "{State.get_placeholder_url()}";
-                    img.setAttribute("data-modal-src", "{State.get_placeholder_url()}");
-                }}
-            ''')
     @use_scope("content", clear=True)
     def alas_daemon_overview(self, task: str) -> None:
         self.init_menu(name=task)
@@ -1725,8 +1446,8 @@ class AlasGUI(Frame):
                     "--loading-border-fill--"
                 )
                 if (
-                    State.deploy_config.EnableRemoteAccess
-                    and State.deploy_config.Password
+                        State.deploy_config.EnableRemoteAccess
+                        and State.deploy_config.Password
                 ):
                     put_text(t("Gui.Remote.NotRunning"), scope="remote_state")
                 else:
@@ -1888,6 +1609,7 @@ class AlasGUI(Frame):
                     {"label": "Dark", "value": "dark", "color": "dark"},
 
                     {"label": "新春 ", "value": "socialism", "color": "danger"},
+                    {"label": "Apple", "value": "apple", "color": "primary"},
                 ],
                 onclick=lambda t: set_theme(t),
             ).style("text-align: center")
@@ -2127,7 +1849,7 @@ class AlasGUI(Frame):
                 return shown.indexOf(announcementId) !== -1;
             };
 
-            window.alasShowAnnouncement = function(title, content, announcementId) {
+            window.alasShowAnnouncement = function(title, content, announcementId, url) {
                 if (window.alasHasBeenShown(announcementId) || document.getElementById('alas-announcement-modal')) {
                     return;
                 }
@@ -2139,32 +1861,53 @@ class AlasGUI(Frame):
 
                 // Create modal content
                 var modal = document.createElement('div');
-                modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3);';
+                var isWeb = !!url;
+                
+                if (isWeb) {
+                    // Web page style: larger, fixed height
+                    modal.style.cssText = 'background:#fff;border-radius:12px;padding:16px;width:95%;max-width:1200px;height:85vh;display:flex;flex-direction:column;box-shadow:0 8px 32px rgba(0,0,0,0.3);';
+                } else {
+                    // Text style: automatic height, narrower
+                    modal.style.cssText = 'background:#fff;border-radius:12px;padding:24px;max-width:500px;width:90%;max-height:80vh;overflow-y:auto;box-shadow:0 8px 32px rgba(0,0,0,0.3);';
+                }
 
                 // Title
                 var titleEl = document.createElement('h3');
                 titleEl.textContent = title;
-                titleEl.style.cssText = 'margin:0 0 16px 0;font-size:1.25rem;color:#333;border-bottom:2px solid #4fc3f7;padding-bottom:8px;';
+                titleEl.style.cssText = 'margin:0 0 12px 0;font-size:1.25rem;color:#333;border-bottom:2px solid #4fc3f7;padding-bottom:8px;flex-shrink:0;';
 
-                // Content
-                var contentEl = document.createElement('div');
-                contentEl.textContent = content;
-                contentEl.style.cssText = 'font-size:1rem;color:#555;line-height:1.6;margin-bottom:20px;white-space:pre-wrap;';
+                modal.appendChild(titleEl);
 
-                // Close button
+                // Content (Text or Iframe)
+                if (isWeb) {
+                    var iframe = document.createElement('iframe');
+                    iframe.src = url;
+                    iframe.style.cssText = 'flex:1;border:none;width:100%;background:#f5f5f5;border-radius:4px;';
+                    modal.appendChild(iframe);
+                } else {
+                    var contentEl = document.createElement('div');
+                    contentEl.textContent = content;
+                    contentEl.style.cssText = 'font-size:1rem;color:#555;line-height:1.6;margin-bottom:20px;white-space:pre-wrap;';
+                    modal.appendChild(contentEl);
+                }
+
+                // Close button area
+                var btnContainer = document.createElement('div');
+                btnContainer.style.cssText = 'margin-top:16px;text-align:center;flex-shrink:0;';
+                
                 var closeBtn = document.createElement('button');
                 closeBtn.textContent = '确认';
-                closeBtn.style.cssText = 'background:linear-gradient(90deg,#00b894,#0984e3);color:#fff;border:none;padding:10px 32px;border-radius:6px;cursor:pointer;font-size:1rem;display:block;margin:0 auto;';
+                closeBtn.style.cssText = 'background:linear-gradient(90deg,#00b894,#0984e3);color:#fff;border:none;padding:10px 32px;border-radius:6px;cursor:pointer;font-size:1rem;display:inline-block;';
                 closeBtn.onmouseover = function(){ closeBtn.style.opacity = '0.9'; };
                 closeBtn.onmouseout = function(){ closeBtn.style.opacity = '1'; };
                 closeBtn.onclick = function(){
                     window.alasMarkAnnouncementShown(announcementId);
                     overlay.remove();
                 };
-
-                modal.appendChild(titleEl);
-                modal.appendChild(contentEl);
-                modal.appendChild(closeBtn);
+                
+                btnContainer.appendChild(closeBtn);
+                modal.appendChild(btnContainer);
+                
                 overlay.appendChild(modal);
 
                 // Close on overlay click
@@ -2185,7 +1928,11 @@ class AlasGUI(Frame):
                     if (isDark) {
                         modal.style.background = '#2d3436';
                         titleEl.style.color = '#dfe6e9';
-                        contentEl.style.color = '#b2bec3';
+                        if (!isWeb) {
+                             // contentEl only exists in text mode
+                             var c = modal.querySelector('div[style*="font-size:1rem"]');
+                             if(c) c.style.color = '#b2bec3';
+                        }
                     }
                 } catch (e) {}
             };
@@ -2277,64 +2024,69 @@ class AlasGUI(Frame):
         self.task_handler.add(self.set_aside_status, 2)
         self.task_handler.add(visibility_state_switch.g(), 15)
         self.task_handler.add(update_switch.g(), 1)
-        self.task_handler.start()
-
-        # Announcement check function - fetches from API and pushes to frontend
-        self._last_announcement_id = None
-        self._announcement_queue = queue.Queue()
+        self.task_handler.add(update_switch.g(), 1)
         
-        def _fetch_announcement_async():
-            """Background thread function to fetch announcement from API"""
-            try:
-                # Add timestamp to bypass cache
-                timestamp = int(time.time())
-                resp = requests.get(
-                    f'https://alas-apiv2.nanoda.work/api/get/announcement?t={timestamp}',
-                    timeout=10
-                )
-                if resp.status_code == 200:
-                    data = resp.json()
-                    if data and data.get('announcementId') and data.get('title') and data.get('content'):
-                        # Put the data in queue for main thread to process
-                        self._announcement_queue.put(data)
-            except Exception as e:
-                logger.debug(f"Announcement fetch failed: {e}")
+        # 公告检查功能
+        self._last_announcement_id = None
         
         def check_and_push_announcement():
-            """Start async fetch and process any queued announcements"""
-            # Start a new fetch in background thread
-            thread = threading.Thread(target=_fetch_announcement_async, daemon=True)
-            thread.start()
-            
-            # Process any announcements that have been fetched
+            """检查公告并推送到前端"""
+            logger.info("开始检查公告...")  # DEBUG
             try:
-                while True:
-                    data = self._announcement_queue.get_nowait()
-                    announcement_id = data['announcementId']
-                    # Only push if ID is different from the last one or not pushed yet
-                    if announcement_id != self._last_announcement_id:
-                        title_json = json.dumps(data['title'])
-                        content_json = json.dumps(data['content'])
-                        announcement_id_json = json.dumps(announcement_id)
-                        run_js(f"window.alasShowAnnouncement({title_json}, {content_json}, {announcement_id_json});")
-                        self._last_announcement_id = announcement_id
-            except queue.Empty:
-                pass
+                from module.base.api_client import ApiClient
+                data = ApiClient.get_announcement(timeout=10)
+                logger.info(f"API返回数据: {bool(data)}") # DEBUG
+                
+                if data:
+                    announcement_id = data.get('announcementId')
+                    logger.info(f"公告ID: {announcement_id}, 上次ID: {self._last_announcement_id}") # DEBUG
+                    
+                    # 只有当ID不同时才推送
+                    if announcement_id and announcement_id != self._last_announcement_id:
+                        # 检查浏览器是否已看过
+                        try:
+                            announcement_id_json = json.dumps(announcement_id)
+                            has_shown = eval_js(f"window.alasHasBeenShown({announcement_id_json})")
+                            logger.info(f"浏览器是否已看过: {has_shown}") # DEBUG
+                            if has_shown:
+                                self._last_announcement_id = announcement_id
+                                return
+                        except Exception as e:
+                            logger.error(f"JS检查失败: {e}") # DEBUG
+                            pass
 
-        # Periodic announcement check generator
+                        title_json = json.dumps(data.get('title', ''))
+                        content_json = json.dumps(data.get('content', ''))
+                        announcement_id_json = json.dumps(announcement_id)
+                        url_json = json.dumps(data.get('url', ''))
+                        
+                        logger.info(f"准备推送公告: {data.get('title')}") # DEBUG
+                        run_js(f"window.alasShowAnnouncement({title_json}, {content_json}, {announcement_id_json}, {url_json});")
+                        self._last_announcement_id = announcement_id
+            except Exception as e:
+                logger.error(f"公告检查异常: {e}")
+                import traceback
+                traceback.print_exc()
+
+        # 定期公告检查生成器
         def announcement_checker():
-            th = yield  # Initial yield to get task handler reference
-            # First check - happens after initial delay (5 seconds)
+            logger.info("公告检查任务启动") # DEBUG
+            th = yield  # 获取任务处理器引用
+            # 首次检查
             check_and_push_announcement()
-            # After first check, set delay to 30 seconds for subsequent checks
+            # 设置后续检查间隔为30秒
             th._task.delay = 30
             yield
             while True:
+                logger.info("执行定期公告检查") # DEBUG
                 check_and_push_announcement()
                 yield
 
-        # Add announcement checker task (initial delay 30 seconds)
-        self.task_handler.add(announcement_checker(), delay=30)
+        # 添加公告检查任务（初始延迟5秒）
+        self.task_handler.add(announcement_checker(), delay=5)
+        
+        # 启动任务处理器
+        self.task_handler.start()
 
         # Return to previous page
 
@@ -2513,8 +2265,8 @@ def startup():
     if State.deploy_config.StartOcrServer:
         start_ocr_server_process(State.deploy_config.OcrServerPort)
     if (
-        State.deploy_config.EnableRemoteAccess
-        and State.deploy_config.Password is not None
+            State.deploy_config.EnableRemoteAccess
+            and State.deploy_config.Password is not None
     ):
         task_handler.add(RemoteAccess.keep_ssh_alive(), 60)
 

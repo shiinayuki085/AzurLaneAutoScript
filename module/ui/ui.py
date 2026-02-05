@@ -221,7 +221,18 @@ class UI(InfoHandler):
         logger.warning(f"Supported page: {[str(page) for page in Page.iter_pages()]}")
         logger.warning('Supported page: Any page with a "HOME" button on the upper-right')
         logger.critical("Please switch to a supported page before starting Alas")
-        raise GamePageUnknownError
+        
+        # ======【需求2】未知页面自动重启======
+        logger.warning("Unknown page detected, try to restart game")
+        from module.handler.login import LoginHandler
+        login_handler = LoginHandler(config=self.config, device=self.device)
+        login_handler.device.app_stop()
+        while login_handler.device.app_is_running():
+            self.device.sleep(0.5)
+        login_handler.device.app_start()
+        login_handler.handle_app_login()
+        return self.ui_get_current_page(skip_first_screenshot=True)
+        # ======【需求2】结束======
 
     def ui_goto(self, destination, get_ship=True, offset=(30, 30), skip_first_screenshot=True):
         """
@@ -559,13 +570,14 @@ class UI(InfoHandler):
         # if self.appear_then_click(HOSPITAL_BATTLE_EXIT, offset=(20, 20), interval=2):
         #     return True
         # Neon city (coalition_20250626)
-        # if self.appear(NEONCITY_FLEET_PREPARATION, offset=(20, 20), interval=3):
-        #     logger.info(f'{NEONCITY_FLEET_PREPARATION} -> {NEONCITY_PREPARATION_EXIT}')
-        #     self.device.click(NEONCITY_PREPARATION_EXIT)
-        #     return True
-        # DATE A LANE (coalition_20251120)
-        if self.appear_then_click(DAL_DIFFICULTY_EXIT, offset=(20, 20), interval=3):
+        # FASHION (coalition_20260122) reuse NEONCITY
+        if self.appear(NEONCITY_FLEET_PREPARATION, offset=(20, 20), interval=3):
+            logger.info(f'{NEONCITY_FLEET_PREPARATION} -> {NEONCITY_PREPARATION_EXIT}')
+            self.device.click(NEONCITY_PREPARATION_EXIT)
             return True
+        # DATE A LANE (coalition_20251120)
+        # if self.appear_then_click(DAL_DIFFICULTY_EXIT, offset=(20, 20), interval=3):
+        #     return True
 
         # Idle page
         if self.handle_idle_page():

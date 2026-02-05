@@ -28,6 +28,10 @@
       "name": "大世界",
       "help": ""
     },
+    "Island": {
+      "name": "Menu.Island.name",
+      "help": "Menu.Island.help"
+    },
     "Tool": {
       "name": "工具",
       "help": ""
@@ -83,7 +87,7 @@
       "help": ""
     },
     "Coalition": {
-      "name": "極地風暴",
+      "name": "光影風尚-拍攝進行時",
       "help": ""
     },
     "MaritimeEscort": {
@@ -97,6 +101,10 @@
     "WarArchives": {
       "name": "作戰檔案",
       "help": "由於作戰檔案缺少維護，開荒功能不一定能正常使用，如果發現Alas運行異常，請手動完成開荒後使用自律尋敵功能"
+    },
+    "CoalitionSp": {
+      "name": "光影風尚-拍攝進行時SP",
+      "help": ""
     },
     "EventA": {
       "name": "活動每日A圖",
@@ -120,10 +128,6 @@
     },
     "RaidDaily": {
       "name": "共鬥活動每日",
-      "help": ""
-    },
-    "CoalitionSp": {
-      "name": "極地風暴每日SP",
       "help": ""
     },
     "Commission": {
@@ -159,7 +163,7 @@
       "help": ""
     },
     "Island": {
-      "name": "Task.Island.name",
+      "name": "Island",
       "help": "Task.Island.help"
     },
     "Daily": {
@@ -258,9 +262,21 @@
       "name": "侵蝕1練級",
       "help": ""
     },
+    "OpsiScheduling": {
+      "name": "OpsiScheduling._info.name",
+      "help": "OpsiScheduling._info.help"
+    },
     "OpsiCrossMonth": {
       "name": "跨月每日",
       "help": "    Alas將在大世界跨月重置之前10分鐘進入大世界，等待大世界重置但不退出大世界，然後完成新一天的大世界每日、隱秘海域、深淵海域和短貓相接，以獲得額外的金菜。運行大世界每日時，按\"大世界每日\"任務設定運行，其餘同理。\n    重要：Alas等待跨月期間，請不要操作遊戲。"
+    },
+    "IslandInfo": {
+      "name": "Task.IslandInfo.name",
+      "help": "Task.IslandInfo.help"
+    },
+    "IslandSeasonTask": {
+      "name": "Task.IslandSeasonTask.name",
+      "help": "Task.IslandSeasonTask.help"
     },
     "Daemon": {
       "name": "半自動點擊",
@@ -638,7 +654,7 @@
     },
     "TaskPriorityAdjustment": {
       "name": "任务优先级调整",
-      "help": "Restart    # 重启游戏\n> OpsiCrossMonth    # 大世界跨月每日\n> Commission > Tactical > Research    # 委托 > 战术学院 > 科研\n> Exercise    # 演习\n> Dorm > Meowfficer > Guild > Gacha    # 后宅 > 指挥喵 > 大舰队 > 每日抽卡\n> Reward    # 收获\n> ShopFrequent > ShopOnce > Shipyard > Freebies    # 通用商店 > 其他商店 > 开发船坞 > 白嫖奖励\n> PrivateQuarters    # 宿舍计划\n> OpsiExplore    # 每月开荒\n> Minigame > Awaken    # 小游戏 > 认知觉醒\n> OpsiAshBeacon    # meta作战\n> OpsiDaily > OpsiShop > OpsiVoucher    # 大世界日常 > 港口商店 > 兑换商店\n> OpsiAbyssal > OpsiStronghold > OpsiObscure > OpsiArchive    # 深渊海域 > 塞壬要塞 > 隐秘海域 > 档案坐标\n> Daily > Hard > OpsiAshBeacon > OpsiAshAssist > OpsiMonthBoss    # 每日挑战 > 困难图 > meta作战 > meta支援 > 月度boss\n> Sos > EventSp > EventA > EventB > EventC > EventD    # Sos > 活动每日SP > 活动每日A > 活动每日B > 活动每日C > 活动每日D\n> RaidDaily > CoalitionSp > WarArchives > MaritimeEscort    # 共斗活动每日 > 共斗活动sp > 作战档案 > 商船护航\n> Event > Event2 > Raid > Hospital > Coalition > Main > Main2 > Main3    # 活动图 > 活动图2 > 共斗活动 > Hospital > 共斗活动 > 主线 > 主线2 > 主线3\n> OpsiMeowfficerFarming    # 短猫相接\n> GemsFarming    # 刷紧急委托\n> OpsiHazard1Leveling    # 侵蚀一练级"
+      "help": "Restart    # 重启游戏\n> OpsiCrossMonth    # 大世界跨月每日\n> Commission > Tactical > Research    # 委托 > 战术学院 > 科研\n> Exercise    # 演习\n> Dorm > Meowfficer > Guild > Gacha    # 后宅 > 指挥喵 > 大舰队 > 每日抽卡\n> Reward    # 收获\n> ShopFrequent > ShopOnce > Shipyard > Freebies > Island    # 通用商店 > 其他商店 > 开发船坞 > 白嫖奖励 > 岛屿计划\n> PrivateQuarters    # 宿舍计划\n> OpsiExplore    # 每月开荒\n> Minigame > Awaken    # 小游戏 > 认知觉醒\n> OpsiAshBeacon    # meta作战\n> OpsiDaily > OpsiShop > OpsiVoucher    # 大世界日常 > 港口商店 > 兑换商店\n> OpsiAbyssal > OpsiStronghold > OpsiObscure > OpsiArchive    # 深渊海域 > 塞壬要塞 > 隐秘海域 > 档案坐标\n> Daily > Hard > OpsiAshBeacon > OpsiAshAssist > OpsiMonthBoss    # 每日挑战 > 困难图 > meta作战 > meta支援 > 月度boss\n> Sos > EventSp > EventA > EventB > EventC > EventD    # Sos > 活动每日SP > 活动每日A > 活动每日B > 活动每日C > 活动每日D\n> RaidDaily > CoalitionSp > WarArchives > MaritimeEscort    # 共斗活动每日 > 共斗活动sp > 作战档案 > 商船护航\n> Event > Event2 > Raid > Hospital > Coalition > Main > Main2 > Main3    # 活动图 > 活动图2 > 共斗活动 > Hospital > 共斗活动 > 主线 > 主线2 > 主线3\n> OpsiMeowfficerFarming    # 短猫相接\n> GemsFarming    # 刷紧急委托\n> OpsiHazard1Leveling    # 侵蚀一练级"
     }
   },
   "OneClickRetire": {
@@ -718,6 +734,7 @@
       "coalition_20240627": "歡迎來到童心學院",
       "coalition_20250626": "迷彩都市的尋蹤者",
       "coalition_20251120": "DATE A LANE",
+      "coalition_20260122": "Light & Shadow Fashion Shoot!",
       "event_20200227_cn": "Northern Overture",
       "event_20200312_cn": "斯圖爾特的硝煙",
       "event_20200326_cn": "Microlayer Medley",
@@ -1416,18 +1433,10 @@
     "Mode": {
       "name": "難度",
       "help": "SP圖需要使用活動每日SP運行",
-      "area1-normal": "area1-normal",
-      "area1-hard": "area1-hard",
-      "area2-normal": "area2-normal",
-      "area2-hard": "area2-hard",
-      "area3-normal": "area3-normal",
-      "area3-hard": "area3-hard",
-      "area4-normal": "area4-normal",
-      "area4-hard": "area4-hard",
-      "area5-normal": "area5-normal",
-      "area5-hard": "area5-hard",
-      "area6-normal": "area6-normal",
-      "area6-hard": "area6-hard"
+      "easy": "easy",
+      "normal": "normal",
+      "hard": "hard",
+      "sp": "sp"
     },
     "Fleet": {
       "name": "出擊隊伍",
@@ -1783,6 +1792,52 @@
     "Favourite": {
       "name": "僅覺醒常用艦船",
       "help": ""
+    }
+  },
+  "IslandTransport": {
+    "_info": {
+      "name": "IslandTransport._info.name",
+      "help": "IslandTransport._info.help"
+    },
+    "SubmitCarrot": {
+      "name": "IslandTransport.SubmitCarrot.name",
+      "help": "IslandTransport.SubmitCarrot.help"
+    },
+    "SubmitCotton": {
+      "name": "IslandTransport.SubmitCotton.name",
+      "help": "IslandTransport.SubmitCotton.help"
+    },
+    "SubmitFlex": {
+      "name": "IslandTransport.SubmitFlex.name",
+      "help": "IslandTransport.SubmitFlex.help"
+    },
+    "SubmitFreshMeat": {
+      "name": "IslandTransport.SubmitFreshMeat.name",
+      "help": "IslandTransport.SubmitFreshMeat.help"
+    },
+    "SubmitManjuu": {
+      "name": "IslandTransport.SubmitManjuu.name",
+      "help": "IslandTransport.SubmitManjuu.help"
+    },
+    "SubmitMilk": {
+      "name": "IslandTransport.SubmitMilk.name",
+      "help": "IslandTransport.SubmitMilk.help"
+    },
+    "SubmitNapaCabbage": {
+      "name": "IslandTransport.SubmitNapaCabbage.name",
+      "help": "IslandTransport.SubmitNapaCabbage.help"
+    },
+    "SubmitOnion": {
+      "name": "IslandTransport.SubmitOnion.name",
+      "help": "IslandTransport.SubmitOnion.help"
+    },
+    "SubmitPoultry": {
+      "name": "IslandTransport.SubmitPoultry.name",
+      "help": "IslandTransport.SubmitPoultry.help"
+    },
+    "SubmitStrawberries": {
+      "name": "IslandTransport.SubmitStrawberries.name",
+      "help": "IslandTransport.SubmitStrawberries.help"
     }
   },
   "Island1": {
@@ -4013,6 +4068,10 @@
     "Cl1Filter": {
       "name": "明石购买筛选",
       "help": "侵蚀一明石一般只购买体力nanoda"
+    },
+    "RecordNonCL1AP": {
+      "name": "OpsiHazard1Leveling.RecordNonCL1AP.name",
+      "help": "OpsiHazard1Leveling.RecordNonCL1AP.help"
     }
   },
   "OpsiSirenBug": {
@@ -4051,6 +4110,10 @@
     "SirenBug_DailyCountRecord": {
       "name": "OpsiSirenBug.SirenBug_DailyCountRecord.name",
       "help": "OpsiSirenBug.SirenBug_DailyCountRecord.help"
+    },
+    "SirenBug_CountLimit": {
+      "name": "OpsiSirenBug.SirenBug_CountLimit.name",
+      "help": "OpsiSirenBug.SirenBug_CountLimit.help"
     }
   },
   "OpsiCheckLeveling": {
@@ -4076,13 +4139,49 @@
       "name": "OpsiScheduling._info.name",
       "help": "OpsiScheduling._info.help"
     },
-    "EnableSmartScheduling": {
-      "name": "OpsiScheduling.EnableSmartScheduling.name",
-      "help": "OpsiScheduling.EnableSmartScheduling.help"
+    "SmartScheduling": {
+      "ActionPointNotifyLevels": {
+        "name": "OpsiScheduling.ActionPointNotifyLevels.name",
+        "help": "OpsiScheduling.ActionPointNotifyLevels.help"
+      },
+      "OperationCoinsReturnThreshold": {
+        "name": "OpsiScheduling.OperationCoinsReturnThreshold.name",
+        "help": "OpsiScheduling.OperationCoinsReturnThreshold.help"
+      },
+      "OperationCoinsReturnThresholdApplyToAllCoinTasks": {
+        "name": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.name",
+        "help": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.help",
+        "True": "True",
+        "False": "False"
+      },
+      "OperationCoinsPreserve": {
+        "name": "Smart Scheduling - CL1 Coins Preserve",
+        "help": "Coins to preserve in Hazard Leveling when smart scheduling is enabled\nThis setting overrides the coins preserve setting in Hazard Leveling task\nSet to 0 to use original setting"
+      },
+      "ActionPointPreserve": {
+        "name": "Smart Scheduling - AP Preserve",
+        "help": "Action points to preserve when smart scheduling is enabled\nApplies to all tasks: Hazard Leveling, Meowfficer Farming, and other coin tasks\nSet to 0 to use original setting"
+      }
+    }
+  },
+  "IslandSeasonTask": {
+    "_info": {
+      "name": "IslandSeasonTask._info.name",
+      "help": "IslandSeasonTask._info.help"
     },
-    "ActionPointNotifyLevels": {
-      "name": "OpsiScheduling.ActionPointNotifyLevels.name",
-      "help": "OpsiScheduling.ActionPointNotifyLevels.help"
+    "TaskDict": {
+      "name": "IslandSeasonTask.TaskDict.name",
+      "help": "IslandSeasonTask.TaskDict.help"
+    }
+  },
+  "IslandTechnology": {
+    "_info": {
+      "name": "IslandTechnology._info.name",
+      "help": "IslandTechnology._info.help"
+    },
+    "TechnologyStatus": {
+      "name": "IslandTechnology.TechnologyStatus.name",
+      "help": "IslandTechnology.TechnologyStatus.help"
     }
   },
   "Daemon": {
@@ -4363,6 +4462,34 @@
       "Clear": "清除",
       "EnterPassword": "輸入密碼",
       "ChooseFile": "選擇檔案"
+    }
+  },
+  "SmartScheduling": {
+    "_info": {
+      "name": "OpsiScheduling._info.name",
+      "help": "OpsiScheduling._info.help"
+    },
+    "ActionPointNotifyLevels": {
+      "name": "OpsiScheduling.ActionPointNotifyLevels.name",
+      "help": "OpsiScheduling.ActionPointNotifyLevels.help"
+    },
+    "OperationCoinsReturnThreshold": {
+      "name": "OpsiScheduling.OperationCoinsReturnThreshold.name",
+      "help": "OpsiScheduling.OperationCoinsReturnThreshold.help"
+    },
+    "OperationCoinsReturnThresholdApplyToAllCoinTasks": {
+      "name": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.name",
+      "help": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.help",
+      "True": "True",
+      "False": "False"
+    },
+    "OperationCoinsPreserve": {
+      "name": "Smart Scheduling - CL1 Coins Preserve",
+      "help": "Coins to preserve in Hazard Leveling when smart scheduling is enabled\nThis setting overrides the coins preserve setting in Hazard Leveling task\nSet to 0 to use original setting"
+    },
+    "ActionPointPreserve": {
+      "name": "Smart Scheduling - AP Preserve",
+      "help": "Action points to preserve when smart scheduling is enabled\nApplies to all tasks: Hazard Leveling, Meowfficer Farming, and other coin tasks\nSet to 0 to use original setting"
     }
   }
 }

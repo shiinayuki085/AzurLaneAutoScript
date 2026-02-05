@@ -28,6 +28,10 @@
       "name": "开放世界探索协议",
       "help": ""
     },
+    "Island": {
+      "name": "Menu.Island.name",
+      "help": "Menu.Island.help"
+    },
     "Tool": {
       "name": "生态工具箱",
       "help": ""
@@ -98,6 +102,10 @@
       "name": "历史档案回溯",
       "help": "由于历史数据接口缺乏维护，自动开荒协议可能存在兼容性波动。如遇异常阻断，建议人工介入完成初始化，随后接管自律寻敌系统。"
     },
+    "CoalitionSp": {
+      "name": "特别寻踪行动 SP",
+      "help": ""
+    },
     "EventA": {
       "name": "周期作业 A区",
       "help": ""
@@ -120,10 +128,6 @@
     },
     "RaidDaily": {
       "name": "常态化共斗流",
-      "help": ""
-    },
-    "CoalitionSp": {
-      "name": "特别寻踪行动 SP",
       "help": ""
     },
     "Commission": {
@@ -159,7 +163,7 @@
       "help": ""
     },
     "Island": {
-      "name": "Task.Island.name",
+      "name": "Island",
       "help": "Task.Island.help"
     },
     "Daily": {
@@ -258,9 +262,21 @@
       "name": "侵蚀1 极致练级",
       "help": ""
     },
+    "OpsiScheduling": {
+      "name": "OpsiScheduling._info.name",
+      "help": "OpsiScheduling._info.help"
+    },
     "OpsiCrossMonth": {
       "name": "跨月无缝衔接",
       "help": "    基于毫秒级时间同步，Alas将在重置前10分钟介入，通过驻留进程实现跨月无缝流转。自动完成跨周期的高价值任务链（每日/隐秘/深渊/短猫）以最大化金菜产出。\n    核心提示：系统执行跨月驻留协议期间，请勿进行人工干预，以免破坏进程保活。"
+    },
+    "IslandInfo": {
+      "name": "Task.IslandInfo.name",
+      "help": "Task.IslandInfo.help"
+    },
+    "IslandSeasonTask": {
+      "name": "Task.IslandSeasonTask.name",
+      "help": "Task.IslandSeasonTask.help"
     },
     "Daemon": {
       "name": "半自动辅助驾驶",
@@ -718,6 +734,7 @@
       "coalition_20240627": "Welcome to Little Academy",
       "coalition_20250626": "The Neon City Investigator",
       "coalition_20251120": "DATE A LANE",
+      "coalition_20260122": "Light & Shadow Fashion Shoot!",
       "event_20200227_cn": "Northern Overture",
       "event_20200312_cn": "The Solomon Ranger Rerun",
       "event_20200326_cn": "Microlayer Medley",
@@ -779,7 +796,7 @@
       "event_20230914_cn": "Effulgence Before Eclipse Rerun",
       "event_20231026_cn": "Tempesta and the Fountain of Youth",
       "event_20231123_cn": "The Ninja Scrolls: Azur Flash",
-      "event_20231221_cn": "Light-Chasing Sea of Stars",
+      "event_20231221_cn": "Light-Chasing Sea of Stars Rerun",
       "event_20240229_cn": "Snowrealm Peregrination",
       "event_20240425_cn": "Heart-Linking Harmony",
       "event_20240521_cn": "Light of the Martyrium",
@@ -1416,18 +1433,10 @@
     "Mode": {
       "name": "Coalition.Mode.name",
       "help": "Coalition.Mode.help",
-      "area1-normal": "area1-normal",
-      "area1-hard": "area1-hard",
-      "area2-normal": "area2-normal",
-      "area2-hard": "area2-hard",
-      "area3-normal": "area3-normal",
-      "area3-hard": "area3-hard",
-      "area4-normal": "area4-normal",
-      "area4-hard": "area4-hard",
-      "area5-normal": "area5-normal",
-      "area5-hard": "area5-hard",
-      "area6-normal": "area6-normal",
-      "area6-hard": "area6-hard"
+      "easy": "easy",
+      "normal": "normal",
+      "hard": "hard",
+      "sp": "sp"
     },
     "Fleet": {
       "name": "Coalition.Fleet.name",
@@ -1783,6 +1792,52 @@
     "Favourite": {
       "name": "Awaken.Favourite.name",
       "help": "Awaken.Favourite.help"
+    }
+  },
+  "IslandTransport": {
+    "_info": {
+      "name": "IslandTransport._info.name",
+      "help": "IslandTransport._info.help"
+    },
+    "SubmitCarrot": {
+      "name": "IslandTransport.SubmitCarrot.name",
+      "help": "IslandTransport.SubmitCarrot.help"
+    },
+    "SubmitCotton": {
+      "name": "IslandTransport.SubmitCotton.name",
+      "help": "IslandTransport.SubmitCotton.help"
+    },
+    "SubmitFlex": {
+      "name": "IslandTransport.SubmitFlex.name",
+      "help": "IslandTransport.SubmitFlex.help"
+    },
+    "SubmitFreshMeat": {
+      "name": "IslandTransport.SubmitFreshMeat.name",
+      "help": "IslandTransport.SubmitFreshMeat.help"
+    },
+    "SubmitManjuu": {
+      "name": "IslandTransport.SubmitManjuu.name",
+      "help": "IslandTransport.SubmitManjuu.help"
+    },
+    "SubmitMilk": {
+      "name": "IslandTransport.SubmitMilk.name",
+      "help": "IslandTransport.SubmitMilk.help"
+    },
+    "SubmitNapaCabbage": {
+      "name": "IslandTransport.SubmitNapaCabbage.name",
+      "help": "IslandTransport.SubmitNapaCabbage.help"
+    },
+    "SubmitOnion": {
+      "name": "IslandTransport.SubmitOnion.name",
+      "help": "IslandTransport.SubmitOnion.help"
+    },
+    "SubmitPoultry": {
+      "name": "IslandTransport.SubmitPoultry.name",
+      "help": "IslandTransport.SubmitPoultry.help"
+    },
+    "SubmitStrawberries": {
+      "name": "IslandTransport.SubmitStrawberries.name",
+      "help": "IslandTransport.SubmitStrawberries.help"
     }
   },
   "Island1": {
@@ -3467,7 +3522,8 @@
       "noshiro": "noshiro",
       "sirius": "sirius",
       "new_jersey": "new_jersey",
-      "taihou": "taihou"
+      "taihou": "taihou",
+      "aegir": "aegir"
     }
   },
   "Daily": {
@@ -4012,6 +4068,10 @@
     "Cl1Filter": {
       "name": "OpsiHazard1Leveling.Cl1Filter.name",
       "help": "OpsiHazard1Leveling.Cl1Filter.help"
+    },
+    "RecordNonCL1AP": {
+      "name": "OpsiHazard1Leveling.RecordNonCL1AP.name",
+      "help": "OpsiHazard1Leveling.RecordNonCL1AP.help"
     }
   },
   "OpsiSirenBug": {
@@ -4050,6 +4110,10 @@
     "SirenBug_DailyCountRecord": {
       "name": "OpsiSirenBug.SirenBug_DailyCountRecord.name",
       "help": "OpsiSirenBug.SirenBug_DailyCountRecord.help"
+    },
+    "SirenBug_CountLimit": {
+      "name": "OpsiSirenBug.SirenBug_CountLimit.name",
+      "help": "OpsiSirenBug.SirenBug_CountLimit.help"
     }
   },
   "OpsiCheckLeveling": {
@@ -4075,13 +4139,49 @@
       "name": "OpsiScheduling._info.name",
       "help": "OpsiScheduling._info.help"
     },
-    "EnableSmartScheduling": {
-      "name": "OpsiScheduling.EnableSmartScheduling.name",
-      "help": "OpsiScheduling.EnableSmartScheduling.help"
+    "SmartScheduling": {
+      "ActionPointNotifyLevels": {
+        "name": "OpsiScheduling.ActionPointNotifyLevels.name",
+        "help": "OpsiScheduling.ActionPointNotifyLevels.help"
+      },
+      "OperationCoinsReturnThreshold": {
+        "name": "OpsiScheduling.OperationCoinsReturnThreshold.name",
+        "help": "OpsiScheduling.OperationCoinsReturnThreshold.help"
+      },
+      "OperationCoinsReturnThresholdApplyToAllCoinTasks": {
+        "name": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.name",
+        "help": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.help",
+        "True": "True",
+        "False": "False"
+      },
+      "OperationCoinsPreserve": {
+        "name": "Smart Scheduling - CL1 Coins Preserve",
+        "help": "Coins to preserve in Hazard Leveling when smart scheduling is enabled\nThis setting overrides the coins preserve setting in Hazard Leveling task\nSet to 0 to use original setting"
+      },
+      "ActionPointPreserve": {
+        "name": "Smart Scheduling - AP Preserve",
+        "help": "Action points to preserve when smart scheduling is enabled\nApplies to all tasks: Hazard Leveling, Meowfficer Farming, and other coin tasks\nSet to 0 to use original setting"
+      }
+    }
+  },
+  "IslandSeasonTask": {
+    "_info": {
+      "name": "IslandSeasonTask._info.name",
+      "help": "IslandSeasonTask._info.help"
     },
-    "ActionPointNotifyLevels": {
-      "name": "OpsiScheduling.ActionPointNotifyLevels.name",
-      "help": "OpsiScheduling.ActionPointNotifyLevels.help"
+    "TaskDict": {
+      "name": "IslandSeasonTask.TaskDict.name",
+      "help": "IslandSeasonTask.TaskDict.help"
+    }
+  },
+  "IslandTechnology": {
+    "_info": {
+      "name": "IslandTechnology._info.name",
+      "help": "IslandTechnology._info.help"
+    },
+    "TechnologyStatus": {
+      "name": "IslandTechnology.TechnologyStatus.name",
+      "help": "IslandTechnology.TechnologyStatus.help"
     }
   },
   "Daemon": {
@@ -4362,6 +4462,34 @@
       "Clear": "Gui.Text.Clear",
       "EnterPassword": "Gui.Text.EnterPassword",
       "ChooseFile": "Gui.Text.ChooseFile"
+    }
+  },
+  "SmartScheduling": {
+    "_info": {
+      "name": "OpsiScheduling._info.name",
+      "help": "OpsiScheduling._info.help"
+    },
+    "ActionPointNotifyLevels": {
+      "name": "OpsiScheduling.ActionPointNotifyLevels.name",
+      "help": "OpsiScheduling.ActionPointNotifyLevels.help"
+    },
+    "OperationCoinsReturnThreshold": {
+      "name": "OpsiScheduling.OperationCoinsReturnThreshold.name",
+      "help": "OpsiScheduling.OperationCoinsReturnThreshold.help"
+    },
+    "OperationCoinsReturnThresholdApplyToAllCoinTasks": {
+      "name": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.name",
+      "help": "OpsiScheduling.OperationCoinsReturnThresholdApplyToAllCoinTasks.help",
+      "True": "True",
+      "False": "False"
+    },
+    "OperationCoinsPreserve": {
+      "name": "Smart Scheduling - CL1 Coins Preserve",
+      "help": "Coins to preserve in Hazard Leveling when smart scheduling is enabled\nThis setting overrides the coins preserve setting in Hazard Leveling task\nSet to 0 to use original setting"
+    },
+    "ActionPointPreserve": {
+      "name": "Smart Scheduling - AP Preserve",
+      "help": "Action points to preserve when smart scheduling is enabled\nApplies to all tasks: Hazard Leveling, Meowfficer Farming, and other coin tasks\nSet to 0 to use original setting"
     }
   }
 }

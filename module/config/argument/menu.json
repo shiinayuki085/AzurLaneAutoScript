@@ -37,13 +37,13 @@
     "menu": "collapse",
     "page": "setting",
     "tasks": [
+      "CoalitionSp",
       "EventA",
       "EventB",
       "EventC",
       "EventD",
       "EventSp",
-      "RaidDaily",
-      "CoalitionSp"
+      "RaidDaily"
     ]
   },
   "Reward": {
@@ -95,7 +95,16 @@
       "OpsiMonthBoss",
       "OpsiMeowfficerFarming",
       "OpsiHazard1Leveling",
+      "OpsiScheduling",
       "OpsiCrossMonth"
+    ]
+  },
+  "Island": {
+    "menu": "collapse",
+    "page": "setting",
+    "tasks": [
+      "IslandInfo",
+      "IslandSeasonTask"
     ]
   },
   "Tool": {
