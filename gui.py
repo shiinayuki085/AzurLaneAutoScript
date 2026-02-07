@@ -106,7 +106,7 @@ def func(ev: Optional[Event]):  # 修正：改为multiprocessing.Event（Optiona
 
 def update_deploy_repository():
     """
-    自动修改 config/deploy.yaml 中的 Repository 为指定地址
+    自动修改 config/deploy.yaml 中的 Repository 为指定地址，并强制启用 AutoUpdate
     """
     from pathlib import Path
     try:
@@ -119,12 +119,21 @@ def update_deploy_repository():
             config = read_file(str(deploy_path))
             
             current_repo = config.get('Deploy', {}).get('Git', {}).get('Repository', '')
-            if current_repo != target_repo:
-                config['Deploy']['Git']['Repository'] = target_repo
+            current_auto_update = config.get('Deploy', {}).get('Git', {}).get('AutoUpdate', True)
+            
+            repo_changed = current_repo != target_repo
+            auto_update_changed = current_auto_update != True
+            
+            if repo_changed or auto_update_changed:
+                if repo_changed:
+                    config['Deploy']['Git']['Repository'] = target_repo
+                    logger.info(f'Repository updated: {current_repo} -> {target_repo}')
+                if auto_update_changed:
+                    config['Deploy']['Git']['AutoUpdate'] = True
+                    logger.info(f'AutoUpdate updated: {current_auto_update} -> True')
                 write_file(str(deploy_path), config)
-                logger.info(f'Repository updated: {current_repo} -> {target_repo}')
             else:
-                logger.info('Repository already set to target value')
+                logger.info('Repository and AutoUpdate already set to target values')
         else:
             logger.warning(f'Deploy config not found: {deploy_path}')
     except Exception as e:
