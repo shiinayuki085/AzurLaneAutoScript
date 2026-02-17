@@ -1750,6 +1750,12 @@ GemsFarming:
   DelayTaskIFNoFlagship: false
   CommissionLimit: false
 ThreeOilLowCost:
+  Scheduler:
+    Enable:
+      type: checkbox
+      value: false
+      option: [true, false]
+
   ChangeFlagship:
     value: ship_equip
     option:
