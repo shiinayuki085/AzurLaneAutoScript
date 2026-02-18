@@ -39,7 +39,7 @@ class CombatManual(ModuleBase):
         if auto != 'hide_in_bottom_left':
             return False
 
-        self.device.long_click(MOVE_LEFT_DOWN, duration=(3.5, 5.5))
+        self.device.long_click(MOVE_LEFT_DOWN, duration=(4.5, 5.5))
         return True
 
     def handle_combat_weapon_release(self):

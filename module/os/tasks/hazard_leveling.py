@@ -250,7 +250,14 @@ class OpsiHazard1Leveling(OSMap):
                 if yellow_coins < cl1_preserve:
                     logger.info(f'黄币不足 ({yellow_coins} < {cl1_preserve})，推迟侵蚀1任务至服务器刷新')
                     self.config.task_delay(server_update=True)
-                    self.config.task_stop()
+                    if not self.is_in_opsi_explore():
+                        cd = self.nearest_task_cooling_down
+                        if cd is None:
+                            for task in ['OpsiAbyssal', 'OpsiStronghold', 'OpsiObscure']:
+                                if self.config.is_task_enabled(task):
+                                    self.config.task_call(task)
+                        self.config.task_call('OpsiMeowfficerFarming')
+                self.config.task_stop()
 
             # 获取当前区域
             self.get_current_zone()
@@ -260,37 +267,17 @@ class OpsiHazard1Leveling(OSMap):
             keep_current_ap = True
             if self.config.OpsiGeneral_BuyActionPointLimit > 0:
                 keep_current_ap = False
-            self.action_point_set(cost=120, keep_current_ap=keep_current_ap, check_rest_ap=True)
-
-            # ===== 智能调度: 行动力阈值推送检查 =====
-            # 在设置行动力后检查是否跨越阈值并推送通知
-            self.check_and_notify_action_point_threshold()
-
-            # ===== 最低行动力保留检查 =====
-            # 检查当前行动力是否低于最低保留值
-            # 使用 OS_ACTION_POINT_PRESERVE，因为它已经包含了智能调度覆盖的逻辑
-
-            # 先获取当前行动力数据（包含箱子里的行动力）
-            self.action_point_enter()
-            self.action_point_safe_get()
-            self.action_point_quit()
-
-            min_reserve = self.config.OS_ACTION_POINT_PRESERVE
-            if self._action_point_total < min_reserve:
-                logger.warning(f'行动力低于最低保留 ({self._action_point_total} < {min_reserve})')
-
-                _previous_ap_insufficient = getattr(self.config, 'OpsiHazard1_PreviousApInsufficient', False)
-                if _previous_ap_insufficient == False:
-                    _previous_ap_insufficient = True
-                    self.notify_push(
-                        title="[Alas] 侵蚀1 - 行动力低于最低保留",
-                        content=f"当前行动力 {self._action_point_total} 低于最低保留 {min_reserve}，推迟任务"
-                    )
-                else:
-                    logger.info('上次检查行动力低于最低保留，跳过推送邮件')
-
-                logger.info('推迟侵蚀1任务1小时')
-                self.config.task_delay(minute=60)
+            self.action_point_set(cost=70, keep_current_ap=keep_current_ap, check_rest_ap=True)
+            if self._action_point_total >= 3000:
+                with self.config.multi_set():
+                    self.config.task_delay(server_update=True)
+                    if not self.is_in_opsi_explore():
+                        cd = self.nearest_task_cooling_down
+                        if cd is None:
+                            for task in ['OpsiAbyssal', 'OpsiStronghold', 'OpsiObscure']:
+                                if self.config.is_task_enabled(task):
+                                    self.config.task_call(task)
+                        self.config.task_call('OpsiMeowfficerFarming')
                 self.config.task_stop()
             else:
                 _previous_ap_insufficient = False

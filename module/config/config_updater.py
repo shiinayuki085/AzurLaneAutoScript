@@ -34,8 +34,8 @@ ARCHIVES_PREFIX = {
 }
 MAINS = ['Main', 'Main2', 'Main3']
 EVENTS = ['Event', 'Event2', 'EventA', 'EventB', 'EventC', 'EventD', 'EventSp']
-GEMS_FARMINGS = ['GemsFarming', 'ThreeOilLowCost']
-RAIDS = ['Raid', 'RaidDaily']
+GEMS_FARMINGS = ['GemsFarming']
+RAIDS = ['Raid', 'RaidDaily', 'RaidScuttle']
 WAR_ARCHIVES = ['WarArchives']
 COALITIONS = ['Coalition', 'CoalitionSp']
 MARITIME_ESCORTS = ['MaritimeEscort']
