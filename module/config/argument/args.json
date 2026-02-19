@@ -388,11 +388,6 @@
       "path": {
         "type": "textarea",
         "value": null
-      },
-      "emulator_id": {
-        "type": "input",
-        "value": 0,
-        "valuetype": "int"
       }
     },
     "Error": {

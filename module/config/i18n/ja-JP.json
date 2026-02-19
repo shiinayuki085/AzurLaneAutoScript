@@ -518,10 +518,6 @@
     "path": {
       "name": "EmulatorInfo.path.name",
       "help": "EmulatorInfo.path.help"
-    },
-    "emulator_id": {
-      "name": "EmulatorInfo.emulator_id.name",
-      "help": "EmulatorInfo.emulator_id.help"
     }
   },
   "Error": {

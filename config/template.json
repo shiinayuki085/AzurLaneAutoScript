@@ -80,8 +80,7 @@
     "EmulatorInfo": {
       "Emulator": "auto",
       "name": null,
-      "path": null,
-      "emulator_id": 0
+      "path": null
     },
     "Error": {
       "HandleError": true,

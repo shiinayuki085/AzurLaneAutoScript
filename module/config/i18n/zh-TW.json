@@ -518,10 +518,6 @@
     "path": {
       "name": "模擬器安裝路徑",
       "help": ""
-    },
-    "emulator_id": {
-      "name": "EmulatorInfo.emulator_id.name",
-      "help": "EmulatorInfo.emulator_id.help"
     }
   },
   "Error": {

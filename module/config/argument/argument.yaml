@@ -129,9 +129,6 @@ EmulatorInfo:
   path:
     value: null
     type: textarea
-  emulator_id:
-    value: 0
-    valuetype: int
 Error:
   HandleError: true
   SaveError: true
