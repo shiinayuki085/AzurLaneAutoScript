@@ -411,6 +411,30 @@
       "ScreenshotLength": {
         "type": "input",
         "value": 1
+      },
+      "GameStuckRestart": {
+        "type": "checkbox",
+        "value": false
+      },
+      "GameStuckThreshold": {
+        "type": "input",
+        "value": 3,
+        "validate": [
+          1,
+          10
+        ]
+      },
+      "AdbOfflineRestart": {
+        "type": "checkbox",
+        "value": false
+      },
+      "AdbOfflineThreshold": {
+        "type": "input",
+        "value": 3,
+        "validate": [
+          1,
+          10
+        ]
       }
     },
     "Optimization": {
@@ -516,6 +540,20 @@
       "BugReport": {
         "type": "checkbox",
         "value": true
+      }
+    },
+    "EmulatorManagement": {
+      "ScheduledEmulatorRestart": {
+        "type": "checkbox",
+        "value": false
+      },
+      "RestartIntervalHours": {
+        "type": "input",
+        "value": 4,
+        "validate": [
+          1,
+          24
+        ]
       }
     },
     "Storage": {
@@ -2736,7 +2774,9 @@
         "option": [
           "Main",
           "Main2",
-          "Main3"
+          "Main3",
+          "GemsFarming",
+          "ThreeOilLowCost"
         ]
       }
     },
@@ -3796,8 +3836,7 @@
       },
       "Fleet2Onsen": {
         "type": "checkbox",
-        "value": false,
-        "display": "hide"
+        "value": false
       }
     },
     "Storage": {
@@ -3949,6 +3988,7 @@
         "value": "non_stop",
         "option": [
           "non_stop",
+          "non_stop_clear_all",
           "100_percent_clear",
           "map_3_stars",
           "threat_safe",
@@ -4160,6 +4200,10 @@
         "type": "checkbox",
         "value": false
       },
+      "Fleet1Onsen": {
+        "type": "checkbox",
+        "value": false
+      },
       "Fleet2Value": {
         "type": "input",
         "value": 119,
@@ -4196,6 +4240,10 @@
         "type": "checkbox",
         "value": false,
         "display": "hide"
+      },
+      "Fleet2Onsen": {
+        "type": "checkbox",
+        "value": false
       }
     },
     "Storage": {
@@ -10844,7 +10892,8 @@
           2,
           3,
           4,
-          5
+          5,
+          6
         ]
       },
       "ShipIndex": {

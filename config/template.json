@@ -87,7 +87,11 @@
       "SaveError": true,
       "StrictRestart": false,
       "OnePushConfig": "provider: null",
-      "ScreenshotLength": 1
+      "ScreenshotLength": 1,
+      "GameStuckRestart": false,
+      "GameStuckThreshold": 3,
+      "AdbOfflineRestart": false,
+      "AdbOfflineThreshold": 3
     },
     "Optimization": {
       "ScreenshotInterval": 0.3,
@@ -107,6 +111,10 @@
       "MeowfficerTalent": "do_not",
       "TelemetryReport": true,
       "BugReport": true
+    },
+    "EmulatorManagement": {
+      "ScheduledEmulatorRestart": false,
+      "RestartIntervalHours": 4
     },
     "Storage": {
       "Storage": {}
@@ -805,11 +813,13 @@
       "Fleet1Control": "prevent_yellow_face",
       "Fleet1Recover": "not_in_dormitory",
       "Fleet1Oath": false,
+      "Fleet1Onsen": false,
       "Fleet2Value": 119,
       "Fleet2Record": "2020-01-01 00:00:00",
       "Fleet2Control": "prevent_yellow_face",
       "Fleet2Recover": "not_in_dormitory",
-      "Fleet2Oath": false
+      "Fleet2Oath": false,
+      "Fleet2Onsen": false
     },
     "Storage": {
       "Storage": {}
