@@ -634,11 +634,14 @@ class RewardCommission(UI, InfoHandler):
             if daily + filtered_urgent + filtered_extra >= 2:
                 logger.info('Having enough commissions to do, delay task `GemsFarming`')
                 self.config.task_delay(minute=None if future else 120, target=future, task='GemsFarming')
-            elif future and future >= night and now < night:
-                logger.info('Waiting for night commissions, delay task `GemsFarming`')
-                self.config.task_delay(target=future, task='GemsFarming')
             elif future and future >= update:
                 logger.info('Waiting for daily commissions, delay task `GemsFarming`')
                 self.config.task_delay(target=future, task='GemsFarming')
             elif future and future - now >= timedelta(hours=1):
+                logger.info('Future commission will finish soon, delay task `GemsFarming`')
                 self.config.task_delay(target=future - timedelta(hours=1), task='GemsFarming')
+            else:
+                logger.info('Not enough commissions to do, run task `GemsFarming` immediately')
+                # Set GemsFarming to run immediately
+                # 使用文件顶部已经导入的datetime
+                self.config.task_delay(target=datetime(2020, 1, 1, 0, 0, 0), task='GemsFarming')
