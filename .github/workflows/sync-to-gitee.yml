@@ -2,7 +2,7 @@ name: Sync GitHub to Gitee
 
 on:
   push:
-    branches: [ main, master ]
+    branches: [ master ]
   workflow_dispatch:
 
 jobs:
@@ -13,11 +13,16 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          persist-credentials: false
 
-      - name: Sync to Gitee
-        uses: wearerequired/git-mirror-action@v1
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.GITEE_PRIVATE_KEY }}
-        with:
-          source-repo: git@github.com:shiinayuki085/AzurLaneAutoScript.git
-          destination-repo: git@gitee.com:shiinayuki/alas.puls.314.git
+      # 配置 Gitee 登录信息
+      - name: Add Gitee remote
+        run: |
+          git config --global user.name "shiinayuki"
+          git config --global user.email "2580647590@qq.com"
+          git remote add gitee https://shiinayuki:${{ secrets.GITEE_TOKEN }}@gitee.com/shiinayuki/alas.puls.314.git
+
+      # 强制同步到 Gitee
+      - name: Push to Gitee
+        run: |
+          git push --force gitee HEAD:master
